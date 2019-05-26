@@ -44,7 +44,7 @@ class EthAvatarForm extends Component {
   handleApplyCropper = (file) => {
     this.setState({
       selectedImageFile: file,
-      selectedImageURL: window.URL.createObjectURL(file)
+      w: window.URL.createObjectURL(file)
     });
   }
 
@@ -69,7 +69,7 @@ class EthAvatarForm extends Component {
 
     // update loading UI
     this.setState({ uploadStarted: true });
-
+    console.log("Start update");
     // First upload image to IPFS and get its hash
     var ipfs = ipfsAPI('ipfs.infura.io', '5001', { protocol: 'https' }); // connect to the unfura IPFS node
 
@@ -78,6 +78,8 @@ class EthAvatarForm extends Component {
     fileReader.onload = () => {
       var data = fileReader.result;
       var buffer = Buffer.from(data);
+      console.log("loaded, adding to ipfs");
+
       ipfs.files.add(buffer, (err, result) => {
         if (err) {
           this.setState({ uploadComplete: true, uploadSuccessful: false });
@@ -112,9 +114,9 @@ class EthAvatarForm extends Component {
 
           // watch the DidSetIPFSHash event
           ethAvatarInstance.events.DidSetIPFSHash({
-            filter: { myIndexedParam: [20, 23], myOtherIndexedParam: '0x123456789...' }, // Using an array means OR: e.g. 20 or 23
-            fromBlock: 0
-          }, function (error, event) {
+            filter: { fromBlock:'latest', 
+            toBlock:'pending'
+          }}, function (error, event) {
             console.debug(event);
             if (!app.state.uploadStarted || event.returnValues.hashAddress !== app.props.ethAddress)
               return;
@@ -148,24 +150,22 @@ class EthAvatarForm extends Component {
             <AvatarImageCropper apply={this.handleApplyCropper} text='Upload Avatar' />
           </div>
           <div className="avatar-preview">
-            <h3>Preview</h3>
             <img src={this.state.selectedImageURL} role="presentation" />
           </div>
           <form className="avatar-metadata" onSubmit={this.handleSubmit}>
-            <label>
-              Title (optional):
+
               <TextField
             autoFocus
             margin="dense"
             id="name"
-            label="Email Address"
-            type="email"
+            label="Title (optionnal)"
+            type="text"
             fullWidth
           />
-                      </label>
+
             <br />
             <br />
-            <Button  onClick={this.handleClose} type="submit" color="primary">
+            <Button type="submit" color="primary">
               Save on Ethereum
           </Button>
           </form>
@@ -212,7 +212,6 @@ class EthAvatarForm extends Component {
             <DialogContentText>
               Upload an image to modify your avatar
           </DialogContentText>
-            <h1>Upload New Avatar</h1>
              {this.renderMain()}
           </DialogContent>
           <DialogActions>

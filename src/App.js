@@ -80,14 +80,15 @@ class App extends Component {
 
     // watch the DidSetIPFSHash event
     ethAvatarInstance.events.DidSetIPFSHash({
-      filter: { myIndexedParam: [20, 23], myOtherIndexedParam: '0x123456789...' }, // Using an array means OR: e.g. 20 or 23
-      fromBlock: 0
-    }, function (error, event) {
-      console.debug(event);
-      // set the updated hash
-      if (event.returnValues.hashAddress === accounts[0])
-        app.setState({ ethAvatarIPFSHash: event.returnValues.hash });
-    });
+      filter: {
+        fromBlock: 'latest',
+        toBlock: 'pending'
+      }}, function(error, event) {
+        console.debug(event);
+        // set the updated hash
+        if (event.returnValues.hashAddress === accounts[0])
+          app.setState({ ethAvatarIPFSHash: event.returnValues.hash });
+      });
     console.log("before");
     // use ethAvatarInstance to retreive the hash of the current account
     var result = await ethAvatarInstance.methods.getIPFSHash(this.state.ethAddress).call();
