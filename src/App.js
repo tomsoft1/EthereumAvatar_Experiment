@@ -10,12 +10,6 @@ import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 import IconButton from '@material-ui/core/IconButton';
-import TextField from '@material-ui/core/TextField';
-import Dialog from '@material-ui/core/Dialog';
-import DialogActions from '@material-ui/core/DialogActions';
-import DialogContent from '@material-ui/core/DialogContent';
-import DialogContentText from '@material-ui/core/DialogContentText';
-import DialogTitle from '@material-ui/core/DialogTitle';
 import EthAvatarImage from './EthAvatarImage.js';
 import EthAvatarForm from './EthAvatarForm.js';
 
@@ -23,54 +17,6 @@ import EthAvatarForm from './EthAvatarForm.js';
 //import './css/open-sans.css';
 //import './css/pure-min.css';
 import './App.css';
-
-function FormDialog() {
-  const [open, setOpen] = React.useState(false);
-
-  function handleClickOpen() {
-    setOpen(true);
-  }
-
-  function handleClose() {
-    setOpen(false);
-  }
-
-  return (
-    <div>
-      <Button variant="outlined" color="primary" onClick={handleClickOpen}>
-        Open form dialog
-      </Button>
-      <Dialog open={open} onClose={handleClose} aria-labelledby="form-dialog-title">
-        <DialogTitle id="form-dialog-title">Subscribe</DialogTitle>
-        <DialogContent>
-          <DialogContentText>
-            To subscribe to this website, please enter your email address here. We will send updates
-            occasionally.
-          </DialogContentText>
-          <TextField
-            autoFocus
-            margin="dense"
-            id="name"
-            label="Email Address"
-            type="email"
-            fullWidth
-          />
-                            <h1>Upload New Avatar</h1>
-                  <EthAvatarForm ethAvatarInstance={this.props.ethAvatarInstance} ethAddress={this.props.ethAddress} />
-
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleClose} color="primary">
-            Cancel
-          </Button>
-          <Button onClick={handleClose} color="primary">
-            Subscribe
-          </Button>
-        </DialogActions>
-      </Dialog>
-    </div>
-  );
-}
 
 
 class App extends Component {
@@ -191,7 +137,7 @@ class App extends Component {
           <AppBar position="static">
             <Toolbar>
               <IconButton edge="start" color="inherit" aria-label="Menu">
-               
+
               </IconButton>
               <Typography variant="h6" >
                 News
@@ -203,8 +149,8 @@ class App extends Component {
             <Grid container spacing={3}>
               <Grid item xs={6}>
                 <h1>Welcome to Eth Avatar!</h1>
-                </Grid>
-                <Grid item xs={6}>
+              </Grid>
+              <Grid item xs={6}>
 
                 <h2>Current Ethereum Address: </h2><h3><code>{this.state.ethAddress}</code></h3>
 
@@ -221,7 +167,7 @@ class App extends Component {
                 </Paper>
               </Grid>
             </Grid>
-          <FormDialog  ethAvatarInstance={this.state.ethAvatarInstance} ethAddress={this.state.ethAddress}></FormDialog>
+            <EthAvatarForm ethAvatarInstance={this.state.ethAvatarInstance} ethAddress={this.state.ethAddress}></EthAvatarForm>
 
           </Container>
         </div>

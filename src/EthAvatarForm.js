@@ -1,6 +1,13 @@
 import React, { Component } from 'react';
 import AvatarImageCropper from 'react-avatar-image-cropper';
 import ReactLoading from 'react-loading';
+import Button from '@material-ui/core/Button';
+import TextField from '@material-ui/core/TextField';
+import Dialog from '@material-ui/core/Dialog';
+import DialogActions from '@material-ui/core/DialogActions';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogContentText from '@material-ui/core/DialogContentText';
+import DialogTitle from '@material-ui/core/DialogTitle';
 
 var ipfsAPI = require('ipfs-api');
 
@@ -15,13 +22,24 @@ class EthAvatarForm extends Component {
 
       uploadStarted: false,
       uploadComplete: false,
-      uploadSuccessful: false
+      uploadSuccessful: false,
+
+      open:false,
+      buttonVisible:false
     };
 
     this.handleInputChange = this.handleInputChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
+    this.handleClickOpen = this.handleClickOpen.bind(this);
+    this.handleClose = this.handleClose.bind(this);
+  }
+  handleClickOpen() {
+    this.setState({ open: true });
   }
 
+  handleClose() {
+    this.setState({ open: false });
+  }
   // handle apply avatar cropping
   handleApplyCropper = (file) => {
     this.setState({
@@ -121,7 +139,7 @@ class EthAvatarForm extends Component {
     }
   }
 
-  render() {
+  renderMain() {
 
     if (!this.state.uploadStarted) {
       return (
@@ -136,11 +154,20 @@ class EthAvatarForm extends Component {
           <form className="avatar-metadata" onSubmit={this.handleSubmit}>
             <label>
               Title (optional):
-              <input type="text" name="title" onChange={this.handleInputChange} />
-            </label>
+              <TextField
+            autoFocus
+            margin="dense"
+            id="name"
+            label="Email Address"
+            type="email"
+            fullWidth
+          />
+                      </label>
             <br />
             <br />
-            <input type="submit" value="Submit" />
+            <Button  onClick={this.handleClose} type="submit" color="primary">
+              Save on Ethereum
+          </Button>
           </form>
         </div>
       );
@@ -170,6 +197,35 @@ class EthAvatarForm extends Component {
       </div>
     );
   }
+
+  render() {
+
+    console.log("state:", this.state);
+    return (
+      <div style={{display:this.state.buttonVisible?"none":""}} >
+        <Button variant="outlined" color="primary" onClick={this.handleClickOpen}>
+           Modify your avatar
+      </Button>
+        <Dialog open={this.state.open} onClose={this.handleClose} aria-labelledby="form-dialog-title">
+          <DialogTitle id="form-dialog-title">Modify your Ethereum Avatar</DialogTitle>
+          <DialogContent>
+            <DialogContentText>
+              Upload an image to modify your avatar
+          </DialogContentText>
+            <h1>Upload New Avatar</h1>
+             {this.renderMain()}
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={this.handleClose} color="primary">
+              Cancel
+          </Button>
+
+          </DialogActions>
+        </Dialog>
+      </div>
+    );
+  }
+
 }
 
 export default EthAvatarForm;
