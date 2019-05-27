@@ -10,6 +10,7 @@ import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 import IconButton from '@material-ui/core/IconButton';
+import TextField from '@material-ui/core/TextField'
 import EthAvatarImage from './EthAvatarImage.js';
 import EthAvatarForm from './EthAvatarForm.js';
 
@@ -68,14 +69,15 @@ class App extends Component {
 
     const networkId = await this.state.web3.eth.net.getId();
     const accounts = await this.state.web3.eth.getAccounts();
-
+  
     const ethAvatarInstance = new this.state.web3.eth.Contract(
       EthAvatarContract.abi,
       EthAvatarContract.networks[networkId].address,
     );
     console.log(ethAvatarInstance);
     this.setState({
-      ethAvatarInstance: ethAvatarInstance
+      ethAvatarInstance: ethAvatarInstance,
+   
     });
 
     // watch the DidSetIPFSHash event
@@ -83,18 +85,29 @@ class App extends Component {
       filter: {
         fromBlock: 'latest',
         toBlock: 'pending'
-      }}, function(error, event) {
-        console.debug(event);
-        // set the updated hash
-        if (event.returnValues.hashAddress === accounts[0])
-          app.setState({ ethAvatarIPFSHash: event.returnValues.hash });
-      });
+      }
+    }, function (error, event) {
+      console.debug(event);
+      // set the updated hash
+      if (event.returnValues.hashAddress === this.state.ethAddress)
+        app.setState({ ethAvatarIPFSHash: event.returnValues.hash });
+    });
+    this.refs.address.getInputNode().value =accounts[0];
+
+    this.updateAdress(accounts[0]);
+  }
+  updateAdress = async(address) =>{
+    this.setState({ethAddress:address});
     console.log("before");
     // use ethAvatarInstance to retreive the hash of the current account
-    var result = await ethAvatarInstance.methods.getIPFSHash(this.state.ethAddress).call();
+    var result = await this.state.ethAvatarInstance.methods.getIPFSHash(address).call();
     console.log("before:", result, ":");
     return this.setState({ ethAvatarIPFSHash: result });
   }
+ handleChange = name => event => {
+    this.setState({ ethAvatarInstance: event.target.value });
+    this.updateAdress(event.target.value);
+  };
 
   render() {
     const styles = theme => ({
@@ -158,7 +171,24 @@ class App extends Component {
               </Grid>
               <Grid item xs={6}>
                 <Paper >
+
                   <h2>Associated Avatar: </h2>
+                  <TextField
+                    autoFocus
+                    margin="dense"
+                    id="address"
+                    ref="address"
+                    label="Eth Address"
+                    onKeyPress={(ev) => {
+                      console.log(`Pressed keyCode ${ev.key}`);
+                      if (ev.key === 'Enter') {
+                        // Do code here
+                        ev.preventDefault();
+                      }
+                    }}
+                    type="text"
+                    fullWidth
+                  />
                   <EthAvatarImage ethAvatarInstance={this.state.ethAvatarInstance} ethAddress={this.state.ethAddress} ipfsHash={this.state.ethAvatarIPFSHash} />
                 </Paper>
               </Grid>

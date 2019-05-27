@@ -8,7 +8,7 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
-
+import Grid from '@material-ui/core/Grid';
 var ipfsAPI = require('ipfs-api');
 
 class EthAvatarForm extends Component {
@@ -24,8 +24,8 @@ class EthAvatarForm extends Component {
       uploadComplete: false,
       uploadSuccessful: false,
 
-      open:false,
-      buttonVisible:false
+      open: false,
+      buttonVisible: false
     };
 
     this.handleInputChange = this.handleInputChange.bind(this);
@@ -44,7 +44,7 @@ class EthAvatarForm extends Component {
   handleApplyCropper = (file) => {
     this.setState({
       selectedImageFile: file,
-      w: window.URL.createObjectURL(file)
+      selectedImageURL: window.URL.createObjectURL(file)
     });
   }
 
@@ -96,7 +96,7 @@ class EthAvatarForm extends Component {
           imageHash: imageHash,
           title: this.state.title
         };
-        var app=this;
+        var app = this;
         var avatarDataBuffer = Buffer.from(JSON.stringify(avatarData));
         ipfs.files.add(avatarDataBuffer, (err, result) => {
           if (err) {
@@ -114,9 +114,11 @@ class EthAvatarForm extends Component {
 
           // watch the DidSetIPFSHash event
           ethAvatarInstance.events.DidSetIPFSHash({
-            filter: { fromBlock:'latest', 
-            toBlock:'pending'
-          }}, function (error, event) {
+            filter: {
+              fromBlock: 'latest',
+              toBlock: 'pending'
+            }
+          }, function (error, event) {
             console.debug(event);
             if (!app.state.uploadStarted || event.returnValues.hashAddress !== app.props.ethAddress)
               return;
@@ -146,22 +148,28 @@ class EthAvatarForm extends Component {
     if (!this.state.uploadStarted) {
       return (
         <div className="eth-avatar-form">
+            <Grid container spacing={3}>
+              <Grid item xs={6}>
           <div className="avatar-image-cropper" style={{ width: '250px', height: '250px', border: '1px solid black' }}>
             <AvatarImageCropper apply={this.handleApplyCropper} text='Upload Avatar' />
           </div>
+          </Grid>
+          <Grid item xs={6}>
           <div className="avatar-preview">
             <img src={this.state.selectedImageURL} role="presentation" />
           </div>
+          </Grid>
+          </Grid>
           <form className="avatar-metadata" onSubmit={this.handleSubmit}>
 
-              <TextField
-            autoFocus
-            margin="dense"
-            id="name"
-            label="Title (optionnal)"
-            type="text"
-            fullWidth
-          />
+            <TextField
+              autoFocus
+              margin="dense"
+              id="name"
+              label="Title (optionnal)"
+              type="text"
+              fullWidth
+            />
 
             <br />
             <br />
@@ -202,21 +210,18 @@ class EthAvatarForm extends Component {
 
     console.log("state:", this.state);
     return (
-      <div style={{display:this.state.buttonVisible?"none":""}} >
+      <div style={{ display: this.state.buttonVisible ? "none" : "" }} >
         <Button variant="outlined" color="primary" onClick={this.handleClickOpen}>
-           Modify your avatar
+          Modify your avatar
       </Button>
         <Dialog open={this.state.open} onClose={this.handleClose} aria-labelledby="form-dialog-title">
           <DialogTitle id="form-dialog-title">Modify your Ethereum Avatar</DialogTitle>
           <DialogContent>
-            <DialogContentText>
-              Upload an image to modify your avatar
-          </DialogContentText>
-             {this.renderMain()}
+            {this.renderMain()}
           </DialogContent>
           <DialogActions>
             <Button onClick={this.handleClose} color="primary">
-              Cancel
+              Close
           </Button>
 
           </DialogActions>
