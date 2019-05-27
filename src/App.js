@@ -1,11 +1,9 @@
 import React, { Component } from 'react';
 import EthAvatarContract from './contracts/EthAvatar.json';
 import getWeb3 from './utils/getWeb3';
-import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
 import Paper from '@material-ui/core/Paper';
 import Container from '@material-ui/core/Container';
-import { makeStyles } from '@material-ui/core/styles';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
@@ -27,9 +25,11 @@ class App extends Component {
     this.state = {
       web3: undefined,
       ethAddress: undefined,
+      myAddress:undefined,
       ethAvatarInstance: undefined,
       ethAvatarIPFSHash: undefined
     };
+    this.myRef = React.createRef();
   }
 
   componentWillMount() {
@@ -44,7 +44,8 @@ class App extends Component {
           console.log("results:", results, accounts, app);
           app.setState({
             web3: results.web3,
-            ethAddress: accounts[0]
+            ethAddress: accounts[0],
+            myAddress: accounts[0]
           });
 
           // Instantiate contract once web3 provided.
@@ -65,7 +66,6 @@ class App extends Component {
   instantiateContract = async () => {
     console.log("la");
     const app = this;
-    const contract = require('truffle-contract');
 
     const networkId = await this.state.web3.eth.net.getId();
     const accounts = await this.state.web3.eth.getAccounts();
@@ -87,22 +87,26 @@ class App extends Component {
         toBlock: 'pending'
       }
     }, function (error, event) {
-      console.debug(event);
+      console.debug("Event:",event);
       // set the updated hash
-      if (event.returnValues.hashAddress === this.state.ethAddress)
+      if (event.returnValues.hashAddress === app.state.ethAddress)
         app.setState({ ethAvatarIPFSHash: event.returnValues.hash });
     });
-    this.refs.address.getInputNode().value =accounts[0];
+//    this.refs.address.getInputNode().value =accounts[0];
 
     this.updateAdress(accounts[0]);
   }
   updateAdress = async(address) =>{
-    this.setState({ethAddress:address});
-    console.log("before");
-    // use ethAvatarInstance to retreive the hash of the current account
-    var result = await this.state.ethAvatarInstance.methods.getIPFSHash(address).call();
-    console.log("before:", result, ":");
-    return this.setState({ ethAvatarIPFSHash: result });
+    try{
+      this.setState({ethAddress:address});
+      console.log("before");
+      // use ethAvatarInstance to retreive the hash of the current account
+      var result = await this.state.ethAvatarInstance.methods.getIPFSHash(address).call();
+      console.log("before:", result, ":");
+      return this.setState({ ethAvatarIPFSHash: result });  
+    }catch(e){
+      alert(e.message);
+    }
   }
  handleChange = name => event => {
     this.setState({ ethAvatarInstance: event.target.value });
@@ -110,6 +114,7 @@ class App extends Component {
   };
 
   render() {
+    window.debug = this;
     const styles = theme => ({
       root: {
         flexGrow: 1,
@@ -138,7 +143,7 @@ class App extends Component {
         // Display a web3 warning.
         <div className="App">
           <main className="container">
-            <h1>⚠️</h1>
+            <h1><span>⚠️</span></h1>
             <p>MetaMask seems to be locked.</p>
           </main>
         </div>
@@ -154,36 +159,36 @@ class App extends Component {
 
               </IconButton>
               <Typography variant="h6" >
-                News
+                EthAvatar
           </Typography>
-              <Button color="inherit">Login</Button>
+             
             </Toolbar>
           </AppBar>
-          <Container maxWidth="100%"   >
+          <Container >
             <Grid container spacing={3}>
               <Grid item xs={6}>
                 <h1>Welcome to Eth Avatar!</h1>
+                Associate an avatar with your ethereum address, and reuse this in any DApp application
               </Grid>
               <Grid item xs={6}>
-
-                <h2>Current Ethereum Address: </h2><h3><code>{this.state.ethAddress}</code></h3>
-
               </Grid>
               <Grid item xs={6}>
                 <Paper >
-
-                  <h2>Associated Avatar: </h2>
+                  Associated Avatar of: 
                   <TextField
                     autoFocus
                     margin="dense"
                     id="address"
                     ref="address"
+                    defaultValue={this.state.ethAddress}
                     label="Eth Address"
+
                     onKeyPress={(ev) => {
                       console.log(`Pressed keyCode ${ev.key}`);
                       if (ev.key === 'Enter') {
                         // Do code here
                         ev.preventDefault();
+                        this.updateAdress(ev.target.value);
                       }
                     }}
                     type="text"
@@ -194,11 +199,13 @@ class App extends Component {
               </Grid>
               <Grid item xs={6}>
                 <Paper >
+                <h2>Current Ethereum Address: </h2><h3><code>{this.state.myAddress}</code></h3>
+
+                <EthAvatarForm ethAvatarInstance={this.state.ethAvatarInstance} ethAddress={this.state.myAddress}></EthAvatarForm>
 
                 </Paper>
               </Grid>
             </Grid>
-            <EthAvatarForm ethAvatarInstance={this.state.ethAvatarInstance} ethAddress={this.state.ethAddress}></EthAvatarForm>
 
           </Container>
         </div>

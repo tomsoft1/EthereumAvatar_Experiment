@@ -6,7 +6,6 @@ import TextField from '@material-ui/core/TextField';
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
-import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import Grid from '@material-ui/core/Grid';
 var ipfsAPI = require('ipfs-api');
@@ -50,11 +49,12 @@ class EthAvatarForm extends Component {
 
   // handle form input change
   handleInputChange(event) {
-    const name = event.target.name;
+    console.log(event);
+//    const name = event.target.name;
     const value = event.target.value;
 
     this.setState({
-      [name]: value
+      "title": value
     });
   }
 
@@ -156,7 +156,7 @@ class EthAvatarForm extends Component {
           </Grid>
           <Grid item xs={6}>
           <div className="avatar-preview">
-            <img src={this.state.selectedImageURL} role="presentation" />
+            <img src={this.state.selectedImageURL} alt="presentation" />
           </div>
           </Grid>
           </Grid>
@@ -165,9 +165,10 @@ class EthAvatarForm extends Component {
             <TextField
               autoFocus
               margin="dense"
-              id="name"
+              id="title"
               label="Title (optionnal)"
               type="text"
+              onChange={this.handleInputChange}
               fullWidth
             />
 

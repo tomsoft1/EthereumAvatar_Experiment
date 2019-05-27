@@ -25,6 +25,8 @@ class EthAvatarImage extends Component {
     }
   }
 
+
+
   loadImageFromIPFS() {
     if(!this.props.ipfsHash)
       return;
@@ -41,6 +43,7 @@ class EthAvatarImage extends Component {
       var hashContent = result[0].content;
       var avatarDataBuffer = Buffer.from(hashContent);
       var avatarData = JSON.parse(avatarDataBuffer.toString());
+      console.log("AvatarData:",avatarData);
 
       // Now fetch the image itself
       ipfs.files.get(avatarData.imageHash, (err, result) => {
@@ -51,7 +54,6 @@ class EthAvatarImage extends Component {
 
         var imageContent = result[0].content;
         var imageBlob = new Blob( [ imageContent ], { type: "image/jpeg" } );
-
         this.setState({
           imageURL: window.URL.createObjectURL(imageBlob),
           title: avatarData.title
